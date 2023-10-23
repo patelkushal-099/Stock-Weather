@@ -1,9 +1,1 @@
-Dependency Resolution: When you execute the mvn dependency:tree command, Maven performs dependency resolution to determine the complete set of dependencies required by the project.
-
-Local Repository: Maven checks if the dependencies are present in the local repository (~/.m2/repository by default) on your machine. If the dependencies are already available locally, Maven uses them directly without attempting to download them again.
-
-Remote Repository: If the required dependencies are not found in the local repository, Maven attempts to download them from the configured remote repositories. Maven follows the repository configuration in the pom.xml file or the global Maven settings (settings.xml) to determine the remote repositories to use.
-
-Downloading Dependencies: When Maven encounters a missing dependency during the dependency:tree goal execution, it initiates the download process for that specific dependency. The dependencies are retrieved from the remote repositories and stored in the local repository for future use.
-
-So, while the primary purpose of mvn dependency:tree is to display the project's dependency tree, it may trigger the download of missing dependencies to ensure that it accurately reflects the complete dependency hierarchy
+I have consistently embodied the organization's values and mindset. I have demonstrated Respect by fostering a diverse and inclusive work environment, upheld Integrity by adhering to the highest ethical standards, and provided exceptional Service through continuous improvement and collaboration. I've pursued Excellence in my work, actively practiced Stewardship by advocating for responsible security practices, and empowered team members to grow and innovate. My Drive has been a driving force in seeking new technologies and pushing the boundaries of security automation, ultimately contributing to the organization's success.
