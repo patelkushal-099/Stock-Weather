@@ -1,0 +1,20 @@
+import paramiko
+
+def test_guest_sftp(hostname, username, password):
+    try:
+        transport = paramiko.Transport((hostname, 22))
+        transport.connect(username=username, password=password)
+        sftp = paramiko.SFTPClient.from_transport(transport)
+
+        print(f"Connected to {hostname} as {username}")
+
+        for item in sftp.listdir_attr('.'):
+            print(f"{item.filename} - {item.st_mode} - {item.st_size} bytes")
+
+        sftp.close()
+        transport.close()
+    except Exception as e:
+        print(f"Failed to connect: {str(e)}")
+
+# Test the guest login
+test_guest_sftp('yourserver', 'guestuser', 'guestpassword')
