@@ -1,0 +1,59 @@
+import json
+
+# Your initial JSON data
+data = {
+    "quiz": {
+        "sport": {
+            "q1": {
+                "question": "Which one is correct team name in NBA?",
+                "options": [
+                    "New York Bulls",
+                    "Los Angeles Kings",
+                    "Golden State Warriors",
+                    "Houston Rockets"
+                ],
+                "answer": "Houston Rockets"
+            }
+        },
+        "maths": {
+            "q1": {
+                "question": "5 + 7 = ?",
+                "options": [
+                    "10",
+                    "11",
+                    "12",
+                    "13"
+                ],
+                "answer": "12"
+            },
+            "q2": {
+                "question": "12 - 8 = ?",
+                "options": [
+                    "1",
+                    "2",
+                    "3",
+                    "4"
+                ],
+                "answer": "4"
+            }
+        }
+    }
+}
+
+# The list to be added
+additional_list = ["123", "456", "789"]
+
+# Function to add the list to each key in the JSON
+def add_list_to_json(obj, add_list):
+    if isinstance(obj, dict):
+        for key in obj:
+            obj[key] = add_list_to_json(obj[key], add_list)
+    elif isinstance(obj, list):
+        obj.extend(add_list)
+    return obj
+
+# Iterate through the JSON data
+updated_data = add_list_to_json(data, additional_list)
+
+# Print the updated JSON data
+print(json.dumps(updated_data, indent=4))
