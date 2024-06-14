@@ -61,8 +61,60 @@ def write_to_excel(results, output_dir):
         output_file = os.path.join(output_dir, f"{parameter}_results.xlsx")
         df.to_excel(output_file, index=False)
 
+# Function to dynamically create payloads for each key in the JSON
+def create_payloads(json_obj, base_path=""):
+    payloads = []
+    for key, value in json_obj.items():
+        new_base_path = f"{base_path}.{key}" if base_path else key
+        if isinstance(value, dict):
+            payloads.extend(create_payloads(value, new_base_path))
+        else:
+            payload = {new_base_path: value}
+            payloads.append(payload)
+    return payloads
+
 def main():
-    payloads = read_payloads('payloads.txt')  # Replace with your payload file path
+    # Example JSON structure
+    json_data = {
+        "quiz": {
+            "sport": {
+                "q1": {
+                    "question": "Which one is correct team name in NBA?",
+                    "options": [
+                        "New York Bulls",
+                        "Los Angeles Kings",
+                        "Golden State Warriros",
+                        "Huston Rocket"
+                    ],
+                    "answer": "Huston Rocket"
+                }
+            },
+            "maths": {
+                "q1": {
+                    "question": "5 + 7 = ?",
+                    "options": [
+                        "10",
+                        "11",
+                        "12",
+                        "13"
+                    ],
+                    "answer": "12"
+                },
+                "q2": {
+                    "question": "12 - 8 = ?",
+                    "options": [
+                        "1",
+                        "2",
+                        "3",
+                        "4"
+                    ],
+                    "answer": "4"
+                }
+            }
+        }
+    }
+
+    payloads = create_payloads(json_data)
     results = []
     max_workers = 10  # Number of concurrent threads
 
