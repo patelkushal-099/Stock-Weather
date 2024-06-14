@@ -1,59 +1,87 @@
+import pandas as pd
 import json
+import subprocess
+import time
 
-# Your initial JSON data
-data = {
-    "quiz": {
-        "sport": {
-            "q1": {
-                "question": "Which one is correct team name in NBA?",
-                "options": [
-                    "New York Bulls",
-                    "Los Angeles Kings",
-                    "Golden State Warriors",
-                    "Houston Rockets"
-                ],
-                "answer": "Houston Rockets"
-            }
-        },
-        "maths": {
-            "q1": {
-                "question": "5 + 7 = ?",
-                "options": [
-                    "10",
-                    "11",
-                    "12",
-                    "13"
-                ],
-                "answer": "12"
-            },
-            "q2": {
-                "question": "12 - 8 = ?",
-                "options": [
-                    "1",
-                    "2",
-                    "3",
-                    "4"
-                ],
-                "answer": "4"
-            }
-        }
-    }
+# Define the API endpoint
+api_url = 'http://example.com/api'
+
+# Load the JSON template
+json_template = '''
+{
+  "user": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "johndoe@example.com",
+    "age": 30,
+    "address": {
+      "street": "123 Main St",
+      "city": "Anytown",
+      "state": "CA",
+      "postalCode": "12345"
+    },
+    "phoneNumbers": [
+      {
+        "type": "home%TEST%",
+        "number": "555-555-5555"
+      },
+      {
+        "type": "work",
+        "number": "555-555-5556"
+      }
+    ]
+  }
 }
+'''
 
-# The list to be added
-additional_list = ["123", "456", "789"]
+# Load payloads from a file
+payload_file = 'payloads.txt'
+with open(payload_file, 'r') as file:
+    payloads = file.readlines()
 
-# Function to add the list to each key in the JSON
-def add_list_to_json(obj, add_list):
-    if isinstance(obj, dict):
-        for key in obj:
-            obj[key] = add_list_to_json(obj[key], add_list)
-    elif isinstance(obj, list):
-        obj.extend(add_list)
-    return obj
+# DataFrame to store the results
+results = []
 
-# Iterate through the JSON data
-updated_data = add_list_to_json(data, additional_list)
+# Function to send a POST request using curl
+def send_request(payload):
+    # Replace %TEST% with the payload
+    json_data = json_template.replace('%TEST%', payload.strip())
+    
+    # Start the timer
+    start_time = time.time()
+    
+    # Execute curl command
+    result = subprocess.run(['curl', '-s', '-X', 'POST', '-H', 'Content-Type: application/json', '-d', json_data, api_url],
+                            capture_output=True, text=True)
+    
+    # Stop the timer
+    end_time = time.time()
+    
+    # Calculate the response time
+    response_time = end_time - start_time
+    
+    # Get the length of request and response payloads
+    request_length = len(json_data)
+    response_length = len(result.stdout)
+    
+    # Store the results
+    results.append({
+        'Payload': payload.strip(),
+        'Request Length': request_length,
+        'Response Length': response_length,
+        'Response Time': response_time,
+        'Response': result.stdout
+    })
 
-# Print the updated JSON data
-print(json.dumps(updated_data, indent=4))
+# Iterate over each payload and send the request
+for payload in payloads:
+    send_request(payload)
+
+# Convert results to a DataFrame
+df = pd.DataFrame(results)
+
+# Save the results to an Excel file
+output_file = 'api_fuzzing_results.xlsx'
+df.to_excel(output_file, index=False)
+
+print(f'Results saved to {output_file}')
